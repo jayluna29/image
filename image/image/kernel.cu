@@ -114,6 +114,12 @@ __global__ void kernel(const unsigned char * src, unsigned char * dst, int level
 		{
 			*(dst + o) = (*(src + o) >= level) ? 255 : 0;
 		}
+		// Notice how the below version avoids having an 'if' statement.
+		// I wonder if this is truly correct - I'll have to test this
+		// carefully someday but it works correctly. I figured the
+		// subtraction should cause an underflow which the shift might
+		// propagate through the rest of the byte so as to cause 255.
+		// *(dst + o) = ~((*(src + o) - level - 1) >> 7);
 	}
 }
 
@@ -121,7 +127,6 @@ void on_trackbar(int, void *)
 {
 	dim3 grid((host_image.cols + 1023) / 1024, host_image.rows);
 	double d;
-
 	int i = inner_slider;
 	int o = outer_slider;
 	if (i > o)
@@ -174,6 +179,50 @@ void on_trackbar(int, void *)
 	imshow(window_name, host_image);
 }
 
+double ConvolveGPU(UBYTE * src, UBYTE * dst, int W, int H, UBYTE * kernel, HighPrecisionTime * timer)
+{
+
+
+}
+double ConvolveCPU(UBYTE * src, UBYTE * dst, int W, int H, UBYTE * kernel, HighPrecisionTime * timer)
+{
+	UBYTE arr[] = { 1,1,1,
+		1,1,1,
+		1,1,1 };
+
+	int kernel_size, half_kernel_size;
+	kernel_size = (getTrackbarPos(kernel_size_name, window_name) + 1) * 2 + 1;
+	half_kernel_size = kernel_size / 2;
+	float divisor = float(SumKernel(kernel, kernel_size));
+
+	timer->TimeSinceLastCall();
+	for (int y = 0; y < H; y++)
+	{
+		for (int x = 0; x < W; x++)
+		{
+			// Initialize with 0,0
+			int sum = 0; // *(src + y * W + x) * kernel[half_kernel_size * kernel_size + half_kernel_size];
+			UBYTE * kp = kernel + half_kernel_size;
+
+			for (int y_offset = -half_kernel_size; y_offset <= half_kernel_size; y_offset++, kp += kernel_size)
+			{
+				if (y_offset + y < 0 || y_offset + y >= H)
+					continue;
+
+				sum += *(src + (y_offset + y) * W + x) * *kp;
+				for (int x_offset = 1; x_offset <= half_kernel_size; x_offset++)
+				{
+					if (x - x_offset >= 0)
+						sum += *(src + (y_offset + y) * W - x_offset + x) * *(kp - x_offset);
+					if (x + x_offset < W)
+						sum += *(src + (y_offset + y) * W + x_offset + x) * *(kp + x_offset);
+				}
+			}
+			*(dst + y * W + x) = UBYTE(float(sum) / divisor);
+		}
+	}
+	return timer->TimeSinceLastCall();
+}
 int main(int argc, char * argv[])
 {
 	if (argc != 2)
@@ -226,7 +275,6 @@ int main(int argc, char * argv[])
 	createTrackbar("Inner", window_name, &inner_slider, 100, on_trackbar);
 	createTrackbar("Outer", window_name, &outer_slider, 100, on_trackbar);
 	on_trackbar(threshold_slider, 0);
-	//BoxFilter(s.data,d.data,s.cols,s.rows, k,3,3,temp.data)
 
 	int k;
 
@@ -246,9 +294,4 @@ int main(int argc, char * argv[])
 		cudaFree(device_dst);
 	cudaDeviceReset();
 	return 0;
-}
-void BoxFilter(UBYTE * s, UBYTE * d, int w, int h, UBYTE * k, int kw, int kh, UBYTE * temp)
-{
-	
-
 }

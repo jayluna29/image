@@ -6,7 +6,10 @@ CUDACOMPILE : nvcc warning : The 'compute_20', 'sm_20', and 'sm_21' architecture
   
   C:\Users\educ\Desktop\image\image>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\bin\nvcc.exe" -gencode=arch=compute_20,code=\"sm_20,compute_20\" --use-local-env --cl-version 2015 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\include"  -G   --keep-dir x64\Debug -maxrregcount=0  --machine 64 --compile -cudart static  -g   -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /FS /Zi /RTC1 /MDd " -o x64\Debug\kernel.cu.obj "C:\Users\educ\Desktop\image\image\kernel.cu" 
 C:\opencv\build\include\opencv2/core/base.hpp(363): warning : function declared with "noreturn" does return
-C:\opencv\build\include\opencv2/core/base.hpp(363): warning : function declared with "noreturn" does return
+C:/Users/educ/Desktop/image/image/kernel.cu(186): warning : missing return statement at end of non-void function "ConvolveGPU"
+C:/Users/educ/Desktop/image/image/kernel.cu(194): error : identifier "kernel_size_name" is undefined
+C:/Users/educ/Desktop/image/image/kernel.cu(196): error : identifier "SumKernel" is undefined
+C:/Users/educ/Desktop/image/image/kernel.cu(189): warning : variable "arr" was declared but never referenced
 CUDACOMPILE : nvcc warning : The 'compute_20', 'sm_20', and 'sm_21' architectures are deprecated, and may be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).
   kernel.cu
-LINK : fatal error LNK1104: cannot open file 'opencv_world320.lib'
+C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\BuildCustomizations\CUDA 8.0.targets(687,9): error MSB3721: The command ""C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\bin\nvcc.exe" -gencode=arch=compute_20,code=\"sm_20,compute_20\" --use-local-env --cl-version 2015 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\include"  -G   --keep-dir x64\Debug -maxrregcount=0  --machine 64 --compile -cudart static  -g   -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /FS /Zi /RTC1 /MDd " -o x64\Debug\kernel.cu.obj "C:\Users\educ\Desktop\image\image\kernel.cu"" exited with code 2.
